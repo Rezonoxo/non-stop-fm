@@ -1,0 +1,98 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Non Stop Pop FM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700;800&family=Manrope:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="shortcut icon" href="logo.png">
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+
+  <div id="liveGate" class="live-gate hidden" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+    <div class="live-gate-card">
+      <p class="chip">Enter the broadcast</p>
+      <h2 id="gateTitle">Welcome to Non Stop Pop FM!</h2>
+      <p class="gate-text">Click the button to go to the live broadcast.</p>
+      <button id="enterLiveBtn" class="btn btn-live" type="button">Enter LIVE</button>
+    </div>
+  </div>
+
+  <main class="radio-shell" aria-label="Web radio player">
+    <header class="station-head">
+      <p class="chip">LOS SANTOS RADIO</p>
+      <div class="station-title-row">
+        <h1>NON STOP POP <span>FM</span></h1>
+        <span class="station-logo-frame" aria-hidden="true">
+          <img class="station-logo" src="logo.png" alt="Non Stop Pop FM logo" />
+        </span>
+      </div>
+      <p id="liveHint" class="live-hint" role="status" aria-live="polite">Connecting to live broadcast...</p>
+    </header>
+
+    <section class="on-air-panel" aria-live="polite">
+      <div class="on-air-left">
+        <span id="liveStatus" class="live-pill" data-live="false">OFF AIR</span>
+        <div class="equalizer" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="controls" role="group" aria-label="Playback controls">
+        <button id="playPauseBtn" class="btn btn-main" type="button" aria-keyshortcuts="Space">Play</button>
+        <button id="liveBtn" class="btn btn-live" type="button" aria-keyshortcuts="L">LIVE</button>
+      </div>
+    </section>
+
+    <section class="now-playing" aria-live="polite">
+      <p class="np-label">Now Playing</p>
+      <p id="nowPlaying" class="np-title">Waiting for stream...</p>
+      <p id="nextPlaying" class="np-next">Next: --</p>
+    </section>
+
+    <section class="jump-track">
+      <label for="trackPickerBtn">Jump to track</label>
+      <div class="station-picker" id="stationPicker">
+        <button
+          id="trackPickerBtn"
+          class="track-picker-btn"
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          aria-controls="trackList"
+        >
+          <span id="trackPickerValue">Choose a track...</span>
+          <span class="picker-chevron" aria-hidden="true"></span>
+        </button>
+        <div id="trackDropdown" class="picker-dropdown" hidden>
+          <ul id="trackList" class="track-list" role="listbox" tabindex="-1" aria-label="Track list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <footer class="legal-footer">
+      <div class="legal-top">
+        <p class="legal-title">Created by Nozer</p>
+        <p class="legal-subtitle">2026</p>
+      </div>
+      <p class="legal-line">Fan-made project. Not affiliated with, endorsed by, or connected to Rockstar Games.</p>
+      <nav class="legal-links" aria-label="Footer links">
+        <a href="https://github.com/rezonoxo" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://nozer.site/" target="_blank" rel="noopener noreferrer">nozer.site</a>
+        <a href="https://github.com/" target="_blank" rel="noopener noreferrer">Source Code</a>
+      </nav>
+    </footer>
+
+    <audio id="radio" preload="metadata" loop autoplay playsinline>
+      <source src="recording.ogg" type="audio/ogg" />
+      Your browser does not support HTML5 audio.
+    </audio>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
