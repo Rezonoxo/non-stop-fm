@@ -42,10 +42,27 @@
         </div>
       </div>
 
+      <div class="volume-control" role="group" aria-label="Volume control">
+        <button
+          id="volumeMuteBtn"
+          class="volume-mute"
+          type="button"
+          aria-label="Mute audio"
+          aria-pressed="false"
+          title="Mute / unmute"
+        >
+          <span id="volumeIcon" class="volume-icon" aria-hidden="true">🔊</span>
+        </button>
+        <input id="volumeSlider" class="volume-slider" type="range" min="0" max="100" value="100" aria-label="Volume" />
+        <span id="volumeValue" class="volume-value">100%</span>
+      </div>
+      
       <div class="controls" role="group" aria-label="Playback controls">
         <button id="playPauseBtn" class="btn btn-main" type="button" aria-keyshortcuts="Space">Play</button>
         <button id="liveBtn" class="btn btn-live" type="button" aria-keyshortcuts="L">LIVE</button>
       </div>
+
+
     </section>
 
     <section class="now-playing" aria-live="polite">

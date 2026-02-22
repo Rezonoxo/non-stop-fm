@@ -52,16 +52,23 @@ const nextPlaying = document.getElementById("nextPlaying");
 const radioShell = document.querySelector(".radio-shell");
 const liveGate = document.getElementById("liveGate");
 const enterLiveBtn = document.getElementById("enterLiveBtn");
+const volumeSlider = document.getElementById("volumeSlider");
+const volumeValue = document.getElementById("volumeValue");
+const volumeMuteBtn = document.getElementById("volumeMuteBtn");
+const volumeIcon = document.getElementById("volumeIcon");
 
 const stationStartMs = new Date(STATION_START_ISO).getTime();
 let bufferTimeoutId = null;
 let isPickerOpen = false;
 let selectedTrackIndex = -1;
 let activeTrackIndex = -1;
+let lastVolumeBeforeMute = 100;
 
 init();
 
 function init() {
+  loadVolumeState();
+  applyVolume(Number(volumeSlider.value), false);
   fillTrackSelect();
   bindEvents();
   if (!Number.isFinite(stationStartMs)) {
@@ -71,6 +78,12 @@ function init() {
 
 function bindEvents() {
   playPauseBtn.addEventListener("click", togglePlayPause);
+
+  volumeSlider.addEventListener("input", (event) => {
+    const volume = parseInt(event.target.value, 10);
+    applyVolume(volume);
+  });
+  volumeMuteBtn.addEventListener("click", toggleMute);
 
   liveBtn.addEventListener("click", async () => {
     syncToLive();
@@ -509,4 +522,84 @@ function updatePickerPlacement() {
   const available = shouldDropUp ? spaceAbove : spaceBelow;
   const safeHeight = Math.max(120, Math.min(preferredListHeight, Math.floor(available)));
   trackList.style.maxHeight = `${safeHeight}px`;
+}
+
+function applyVolume(value, persist = true) {
+  const safeVolume = Math.max(0, Math.min(100, Number(value) || 0));
+  const isMuted = safeVolume === 0;
+
+  audio.volume = safeVolume / 100;
+  audio.muted = isMuted;
+  volumeSlider.value = String(safeVolume);
+  volumeValue.textContent = `${safeVolume}%`;
+  volumeSlider.style.setProperty("--volume-progress", `${safeVolume}%`);
+  updateVolumeIcon(safeVolume);
+  volumeMuteBtn.setAttribute("aria-pressed", String(isMuted));
+  volumeMuteBtn.setAttribute("aria-label", isMuted ? "Unmute audio" : "Mute audio");
+
+  if (!isMuted) {
+    lastVolumeBeforeMute = safeVolume;
+  }
+
+  if (persist) {
+    saveVolumeState(safeVolume, lastVolumeBeforeMute);
+  }
+}
+
+function toggleMute() {
+  const currentVolume = parseInt(volumeSlider.value, 10) || 0;
+  if (currentVolume === 0) {
+    const restored = Math.max(1, lastVolumeBeforeMute || 60);
+    applyVolume(restored);
+    return;
+  }
+
+  lastVolumeBeforeMute = currentVolume;
+  applyVolume(0);
+}
+
+function updateVolumeIcon(volume) {
+  if (volume <= 0) {
+    volumeIcon.textContent = "🔇";
+    return;
+  }
+
+  if (volume < 45) {
+    volumeIcon.textContent = "🔉";
+    return;
+  }
+
+  volumeIcon.textContent = "🔊";
+}
+
+function loadVolumeState() {
+  try {
+    const savedVolume = window.localStorage.getItem("radioVolume");
+    const savedLast = window.localStorage.getItem("radioVolumeLast");
+
+    if (savedVolume !== null) {
+      const parsedVolume = parseInt(savedVolume, 10);
+      if (Number.isFinite(parsedVolume)) {
+        volumeSlider.value = String(Math.max(0, Math.min(100, parsedVolume)));
+      }
+    }
+
+    if (savedLast !== null) {
+      const parsedLast = parseInt(savedLast, 10);
+      if (Number.isFinite(parsedLast) && parsedLast > 0) {
+        lastVolumeBeforeMute = Math.min(100, parsedLast);
+      }
+    }
+  } catch (_error) {
+    // Ignore storage access issues (private mode / blocked storage).
+  }
+}
+
+function saveVolumeState(volume, lastVolume) {
+  try {
+    window.localStorage.setItem("radioVolume", String(volume));
+    window.localStorage.setItem("radioVolumeLast", String(lastVolume));
+  } catch (_error) {
+    // Ignore storage access issues (private mode / blocked storage).
+  }
 }

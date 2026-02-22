@@ -156,6 +156,27 @@ h1 span {
   transform: scale(1.05);
 }
 
+.radio-shell.playing .station-logo {
+  animation: logo-pulse 0.62s ease-in-out infinite;
+}
+
+@keyframes logo-pulse {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.3));
+  }
+  50% {
+    transform: scale(1.04);
+    filter:
+      drop-shadow(0 0 8px rgba(255, 79, 167, 0.35))
+      drop-shadow(0 0 12px rgba(59, 224, 255, 0.24));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.3));
+  }
+}
+
 .live-hint {
   margin: 0;
   font-size: 0.95rem;
@@ -232,6 +253,137 @@ h1 span {
 .controls {
   display: flex;
   gap: 10px;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  min-width: min(318px, 100%);
+  border: 1px solid rgba(95, 228, 255, 0.2);
+  background: linear-gradient(135deg, rgba(13, 18, 39, 0.9), rgba(7, 11, 26, 0.78));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 8px 24px rgba(0, 0, 0, 0.24);
+}
+
+.volume-mute {
+  border: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255, 79, 167, 0.28), rgba(59, 224, 255, 0.22));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.volume-mute:hover {
+  transform: translateY(-1px);
+  filter: saturate(1.2);
+}
+
+.volume-mute:active {
+  transform: translateY(0);
+}
+
+.volume-mute:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+.volume-mute[aria-pressed="true"] {
+  background: linear-gradient(135deg, rgba(46, 61, 102, 0.72), rgba(21, 31, 59, 0.72));
+}
+
+.volume-icon {
+  font-size: 1.05rem;
+  flex-shrink: 0;
+  line-height: 1;
+  filter: drop-shadow(0 0 5px rgba(59, 224, 255, 0.35));
+}
+
+.volume-slider {
+  flex: 1;
+  min-width: 120px;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--pink) 0%,
+    #ff79c4 var(--volume-progress, 100%),
+    rgba(86, 108, 158, 0.62) var(--volume-progress, 100%),
+    rgba(86, 108, 158, 0.62) 100%
+  );
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  transition: background 0.2s ease, filter 0.2s ease;
+}
+
+.volume-slider:hover {
+  filter: brightness(1.12);
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--pink-strong), #ff7ac4);
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(255, 79, 167, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 18px rgba(255, 79, 167, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.volume-slider::-webkit-slider-thumb:active {
+  transform: scale(1.1);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--pink-strong), #ff7ac4);
+  cursor: pointer;
+  border: 0;
+  box-shadow: 0 0 12px rgba(255, 79, 167, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.volume-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 18px rgba(255, 79, 167, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.volume-slider::-moz-range-thumb:active {
+  transform: scale(1.1);
+}
+
+.volume-slider::-moz-range-track {
+  background: transparent;
+  border: 0;
+}
+
+.volume-value {
+  min-width: 42px;
+  text-align: right;
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--cyan);
+  text-shadow: 0 0 10px rgba(59, 224, 255, 0.35);
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
 }
 
 .btn {
@@ -589,6 +741,15 @@ h1 span {
     align-items: flex-start;
   }
 
+  .volume-control {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .volume-slider {
+    min-width: 100px;
+  }
+
   .station-logo {
     width: clamp(56px, 16vw, 82px);
   }
@@ -621,5 +782,3 @@ h1 span {
     transition: none !important;
   }
 }
-
-
