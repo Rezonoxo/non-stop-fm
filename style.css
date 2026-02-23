@@ -19,6 +19,7 @@ html,
 body {
   margin: 0;
   min-height: 100%;
+  height: 100%;
 }
 
 body {
@@ -27,6 +28,17 @@ body {
   display: grid;
   place-items: center;
   padding: 24px;
+  min-height: 100dvh;
+  position: relative;
+  background-color: var(--bg-main);
+  overflow: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
   background:
     radial-gradient(1300px 840px at -6% -15%, rgba(44, 12, 63, 0.6) 0%, transparent 58%),
     radial-gradient(980px 650px at 110% 8%, rgba(3, 64, 90, 0.56) 0%, transparent 55%),
@@ -34,17 +46,15 @@ body {
     url("https://media.rockstargames.com/rockstargames/img/global/news/upload/10_gtavpc_03272015.jpg");
   background-position: center;
   background-size: cover;
-  background-attachment: fixed;
   background-repeat: no-repeat;
   background-blend-mode: screen, screen, multiply, normal;
-  overflow-x: hidden;
 }
 
 .noise {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 1;
+  z-index: -1;
   opacity: 0.13;
   background-image: radial-gradient(rgba(255, 255, 255, 0.36) 0.45px, transparent 0.45px);
   background-size: 3px 3px;
@@ -54,6 +64,8 @@ body {
   position: relative;
   z-index: 1;
   width: min(760px, 100%);
+  max-height: calc(100dvh - 48px);
+  overflow: hidden;
   padding: 30px;
   border-radius: 22px;
   border: 1px solid var(--line);
@@ -586,62 +598,91 @@ h1 span {
 }
 
 .legal-footer {
-  margin-top: 20px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-  font-size: 0.82rem;
-  color: #a39ebd;
+  margin-top: 14px;
+  padding: 11px 12px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  font-size: 0.84rem;
+  color: #b8b2cd;
   display: grid;
+  gap: 8px;
+}
+
+.legal-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: 10px;
 }
 
-.legal-top {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 8px 12px;
+.legal-identity {
+  display: grid;
+  gap: 4px;
 }
 
-.legal-title {
+.legal-station {
+  margin: 0;
+  font-size: 0.73rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a9a3bf;
+}
+
+.legal-author {
   margin: 0;
   font-family: "Barlow Condensed", sans-serif;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  font-size: 1rem;
-  color: #ebe8ff;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: #f6f4ff;
 }
 
-.legal-subtitle {
+.legal-disclaimer {
   margin: 0;
-  color: #a39ebd;
+  max-width: 56ch;
+  line-height: 1.45;
+  color: #bbb5cf;
 }
 
-.legal-line {
-  margin: 0;
-}
-
-.legal-links {
+.legal-nav {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  align-self: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 6px;
+  margin: 0 0 0 auto;
 }
 
-.legal-links a {
-  color: #c8f6ff;
+.legal-nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 132px;
+  color: #d1f8ff;
   text-decoration: none;
-  border: 1px solid rgba(59, 224, 255, 0.32);
-  background: rgba(59, 224, 255, 0.08);
+  border: 1px solid rgba(59, 224, 255, 0.35);
+  background: rgba(59, 224, 255, 0.1);
   border-radius: 999px;
   padding: 5px 10px;
-  transition: transform 0.2s ease, background 0.22s ease, border-color 0.22s ease, color 0.2s ease;
+  line-height: 1.2;
+  transition: transform 0.18s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-.legal-links a:hover {
+.legal-nav a:hover {
   color: #f2fcff;
   border-color: rgba(141, 238, 255, 0.9);
   background: rgba(141, 238, 255, 0.22);
   transform: translateY(-1px);
+}
+
+.legal-note {
+  margin: 0;
+  padding-top: 7px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #9f99b5;
 }
 
 .live-gate {
@@ -686,6 +727,7 @@ h1 span {
   }
 
   .radio-shell {
+    max-height: calc(100dvh - 28px);
     padding: 20px;
   }
 
@@ -724,6 +766,28 @@ h1 span {
   .track-option {
     padding: 8px 9px;
     font-size: 0.9rem;
+  }
+
+  .legal-footer {
+    margin-top: 16px;
+    padding: 12px;
+  }
+
+  .legal-main {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .legal-nav {
+    margin: 0;
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .legal-nav a {
+    min-width: 0;
   }
 }
 

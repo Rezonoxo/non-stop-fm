@@ -392,7 +392,7 @@ function openTrackPicker(startIndex) {
   trackDropdown.hidden = false;
   trackPickerBtn.setAttribute("aria-expanded", "true");
   setActiveOption(startIndex);
-  trackList.focus();
+  trackList.focus({ preventScroll: true });
 }
 
 function closeTrackPicker() {
@@ -507,14 +507,14 @@ function hideGate() {
 
 function updatePickerPlacement() {
   const rect = stationPicker.getBoundingClientRect();
-  const viewportHeight = window.innerHeight;
+  const shellRect = radioShell.getBoundingClientRect();
   const gap = 14;
   const minListHeight = 150;
   const preferredListHeight = 210;
   const dropdownOffset = 8;
 
-  const spaceBelow = viewportHeight - rect.bottom - gap - dropdownOffset;
-  const spaceAbove = rect.top - gap - dropdownOffset;
+  const spaceBelow = shellRect.bottom - rect.bottom - gap - dropdownOffset;
+  const spaceAbove = rect.top - shellRect.top - gap - dropdownOffset;
   const shouldDropUp = spaceBelow < minListHeight && spaceAbove > spaceBelow;
 
   stationPicker.classList.toggle("drop-up", shouldDropUp);
