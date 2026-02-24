@@ -1,5 +1,7 @@
-﻿const STATION_START_ISO = "2019-11-08T19:42:00Z";
+const STATION_START_ISO = "2019-11-08T19:42:00Z";
 const BUFFER_WARNING_MS = 9000;
+const PROJECTS_PROMPT_AFTER_MS = 180000;
+const PROJECTS_PROMPT_STORAGE_KEY = "projectsPromptDismissed";
 
 const TRACKS = [
   { time: "0:00:05", title: "Modjo - Lady (Hear Me Tonight)" },
@@ -56,6 +58,8 @@ const volumeSlider = document.getElementById("volumeSlider");
 const volumeValue = document.getElementById("volumeValue");
 const volumeMuteBtn = document.getElementById("volumeMuteBtn");
 const volumeIcon = document.getElementById("volumeIcon");
+const projectsPrompt = document.getElementById("projectsPrompt");
+const projectsPromptClose = document.getElementById("projectsPromptClose");
 
 const stationStartMs = new Date(STATION_START_ISO).getTime();
 let bufferTimeoutId = null;
@@ -63,10 +67,15 @@ let isPickerOpen = false;
 let selectedTrackIndex = -1;
 let activeTrackIndex = -1;
 let lastVolumeBeforeMute = 100;
+let listeningMs = 0;
+let lastListeningTick = null;
+let projectsPromptShown = false;
+let projectsPromptDismissed = false;
 
 init();
 
 function init() {
+  loadProjectsPromptState();
   loadVolumeState();
   applyVolume(Number(volumeSlider.value), false);
   fillTrackSelect();
@@ -84,6 +93,9 @@ function bindEvents() {
     applyVolume(volume);
   });
   volumeMuteBtn.addEventListener("click", toggleMute);
+  if (projectsPromptClose) {
+    projectsPromptClose.addEventListener("click", dismissProjectsPrompt);
+  }
 
   liveBtn.addEventListener("click", async () => {
     syncToLive();
@@ -190,6 +202,7 @@ function bindEvents() {
   });
 
   audio.addEventListener("play", () => {
+    markListeningTick();
     playPauseBtn.textContent = "Pause";
     radioShell.classList.add("playing");
     hideGate();
@@ -200,6 +213,7 @@ function bindEvents() {
   });
 
   audio.addEventListener("pause", () => {
+    accumulateListeningTime();
     playPauseBtn.textContent = "Play";
     radioShell.classList.remove("playing");
     clearBufferWarning();
@@ -229,8 +243,10 @@ function bindEvents() {
   });
 
   audio.addEventListener("timeupdate", () => {
+    accumulateListeningTime();
     updateLiveState();
     updateNowPlaying();
+    maybeShowProjectsPrompt();
   });
 
   document.addEventListener("keydown", (event) => {
@@ -560,16 +576,68 @@ function toggleMute() {
 
 function updateVolumeIcon(volume) {
   if (volume <= 0) {
-    volumeIcon.textContent = "🔇";
+    volumeIcon.textContent = "\uD83D\uDD07";
     return;
   }
 
   if (volume < 45) {
-    volumeIcon.textContent = "🔉";
+    volumeIcon.textContent = "\uD83D\uDD09";
     return;
   }
 
-  volumeIcon.textContent = "🔊";
+  volumeIcon.textContent = "\uD83D\uDD0A";
+}
+
+function markListeningTick() {
+  if (lastListeningTick === null) {
+    lastListeningTick = Date.now();
+  }
+}
+function accumulateListeningTime() {
+  if (audio.paused) {
+    lastListeningTick = null;
+    return;
+  }
+  const now = Date.now();
+  if (lastListeningTick === null) {
+    lastListeningTick = now;
+    return;
+  }
+  listeningMs += Math.max(0, now - lastListeningTick);
+  lastListeningTick = now;
+}
+function maybeShowProjectsPrompt() {
+  if (!projectsPrompt || projectsPromptShown || projectsPromptDismissed) {
+    return;
+  }
+  if (listeningMs < PROJECTS_PROMPT_AFTER_MS) {
+    return;
+  }
+  projectsPrompt.hidden = false;
+  projectsPromptShown = true;
+}
+function dismissProjectsPrompt() {
+  if (!projectsPrompt) {
+    return;
+  }
+  projectsPrompt.hidden = true;
+  projectsPromptDismissed = true;
+  saveProjectsPromptState();
+}
+function loadProjectsPromptState() {
+  try {
+    const saved = window.localStorage.getItem(PROJECTS_PROMPT_STORAGE_KEY);
+    projectsPromptDismissed = saved === "1";
+  } catch (_error) {
+    projectsPromptDismissed = false;
+  }
+}
+function saveProjectsPromptState() {
+  try {
+    window.localStorage.setItem(PROJECTS_PROMPT_STORAGE_KEY, "1");
+  } catch (_error) {
+    // Ignore storage access issues (private mode / blocked storage).
+  }
 }
 
 function loadVolumeState() {
@@ -603,3 +671,4 @@ function saveVolumeState(volume, lastVolume) {
     // Ignore storage access issues (private mode / blocked storage).
   }
 }
+
